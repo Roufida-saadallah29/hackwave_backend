@@ -34,44 +34,8 @@ exports.SuppUser = (req, res) => {
    
     })};
       
-    exports.SuppUserauto= (req, res) => {
 
-      return new Promise((resolve,reject)=>{
-        const Objs = JSON.parse(JSON.stringify(req.body));
-        const oj= Object.values(Objs)
-        oj.forEach((obj) => {
-          User.findOne({
-            where:{
-              username: obj.username,
-              email: obj.email
-          }
-          }).then(usr=>{
-            if (!usr) {
-             return res.status(404).send({
-               message: "it's does not exist!"
-             });
-            }
-          else { 
-             User.destroy({
-              where:{
-                username: obj.username,
-                email: obj.email
-            }
-            })
-            resolve("done!");}}) 
-             .catch(err => {
-                reject(err)
-                  })})
-      
-     
-      })};
-
-
-
-
-
-
-    exports.modifyUserProfile= (req, res) => {
+exports.modifyUserProfile= (req, res) => {
 
       return new Promise((resolve,reject)=>{
           User.findOne({
@@ -85,14 +49,6 @@ exports.SuppUser = (req, res) => {
                });
               }
             else {
-                   if(req.body.profile_picture != null){
-                         usr.update({
-                          profile_picture: req.body.profile_picture
-                         },{
-                             where:{
-                                 userid: useridds
-                             }
-                         })}
                   
                       if(req.body.Numéro_telephone != null){
                         usr.update({
@@ -113,28 +69,8 @@ exports.SuppUser = (req, res) => {
     });
       })};
      
-        exports.profilepic = (req, res) => {
-          return new Promise((resolve,reject)=>{
-            User.findOne({ where:{
-              id: req.body.id,
-              email: req.body.email
-            } })
-            .then(data => {
-              res.send(data.profile_picture);
-              resolve("done!"); 
-              }) 
-              .catch(err => {
-                 reject(err)
-                  });
-            })
-            .catch(err => {
-              res.status(500).send({
-                message:
-                  err.message || "picture can not be load"
-              });
-            });
-                } ; 
-      exports.Changermotpass= (req, res) => {
+
+exports.Changermotpass= (req, res) => {
         return new Promise((resolve,reject)=>{
           User.findOne({
             where:{

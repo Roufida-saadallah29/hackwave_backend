@@ -1,13 +1,13 @@
 const db = require("../models");
-const config = require("../config/auth.config");
 var nodemailer = require('nodemailer');
-const { user } = require("../models");
 const User = db.user;
 const Etudiant= db.Etudiant;
 const Promo =db.Promo;
 const Groupe=db.Groupe;
 const Annee=db.Annee;
+const EtudiantModule=db.EtudiantModule
 // const photo=require("C:/Users/LENOVO/Downloads/backend1CSProject-20220517T205521Z-001/backend1CSProject/upload/images/pic_1171831236_1.png");
+
 
 exports.ajouteretudiant = (req, res) => {
     return new Promise((resolve,reject)=>{
@@ -27,7 +27,7 @@ exports.ajouteretudiant = (req, res) => {
           service: 'gmail',
           auth: {
             user: 'jr_saadallah@esi.dz',
-            pass: 'NFWs=3*g:t/53DK|@,}U3:1&QCK_rKk$L-XVbE9]'
+            pass: 'mypass'
           }});
         var mailOptions = {
           from: 'jr_saadallah@esi.dz',
@@ -129,14 +129,16 @@ exports.ajouteretudautomatique=(req, res) => {
         var transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
-            user: 'hz.taibi@esi-sba.dz',
-            pass: '$ f $ ; f @15973.0'
+            user: 'jr_saadallah@esi.dz',
+            pass: 'mypass'
+
           }});
         var mailOptions = {
-          from: 'hz.taibi@esi-sba.dz',
+          from: 'jr_saadallah@esi.dz',
           to: obj.email,
-          subject: 'ESI House Learnning platform',
-          text:  'Dear student, welcome to our platform, feel free to use our EHL website, please log in with your existing email and this is your password which you can change whenever you want: ' + pass,
+          subject: 'IBN Rochd Learnning platform',
+          text:  'Dear student, welcome to our platform, please log in with your existing email and this is your password which you can change whenever you want: ' + pass,
+        
         };
         transporter.sendMail(mailOptions, function(error, info){
           if (error) {
@@ -629,7 +631,7 @@ exports.modifyUserEtu= (req, res) => {
 
 }
   })}
-  exports.Listetudiant = (req, res) => {
+exports.Listetudiant = (req, res) => {
     return new Promise((resolve,reject)=>{
       Etudiant.findAll({ 
         include: [{
@@ -675,3 +677,96 @@ exports.getStudent= async (req, res) => {
 });
   
 }
+
+exports.consulterNotes= async (req, res) => {
+  Etudiant.findOne(
+    {
+      where:{
+        Id:req.body.EtudiantId,
+      }
+    }
+  )
+  .then(etud=>{
+
+    Groupe.findOne(
+      {
+        where:{
+          PromoId:etud.GroupeId,
+        }
+      }
+    )
+    .then(grp=>{
+  
+      EtudiantModule.findAll (
+        {
+          where:{
+            PromoId:grp.PromoId,
+            EtudiantId:req.body.EtudiantId
+          }
+        }
+      )
+      .then(notes=>{
+        
+          return res.json(notes);
+    
+      })
+      .catch(err => {
+      res.send({
+        message: err.message
+      });
+    });
+  
+    })
+    .catch(err => {
+    res.send({
+      message: err.message
+    });
+  });
+  })
+  .catch(err => {
+  res.send({
+    message: err.message
+  });
+});
+  
+}
+exports.getStudentGroupe = async (req, res) => {
+    try {
+      const students = await Etudiant.findAll({
+        where: {
+          GroupeId: req.body.GroupeId,
+        },
+      });
+
+      const userPromises = students.map(async (student) => {
+        const user = await User.findOne({
+          where: {
+            id: student.userId,
+          },
+        });
+        return {
+          FirstName: user.FirstName,
+          LastName: user.LastName,
+          EtudiantId: student.Id,
+          module: req.body.module,
+          emd1: 0,
+          emd2: 0,
+          CC: 0,
+          remarque:""
+        };
+
+      });
+      // const users = students.map((student) => ({
+      //   FirstName: student.user.FirstName,
+      //   LastName: student.user.LastName,
+      //   EtudiantId: student.Id,
+      // }));
+      const users = await Promise.all(userPromises);
+
+      return res.json(users);
+    } catch (err) {
+      return res.status(500).json({
+        message: err.message,
+      });
+    }
+  };

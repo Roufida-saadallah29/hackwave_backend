@@ -9,7 +9,7 @@ const app = express();
 app.use(fileUpload());
 
 var corsOptions = {
-  origin: "http://192.168.196.22:3000"
+  origin: "http://192.168.30.22:3000"
 };
 
 app.use(cors(corsOptions));
@@ -100,13 +100,30 @@ require('./app/routes/emplois.routes')(app);
 //   nom:"G2", 
 //   PromoId:01
 // });
-// db.Module.create({
-//   Id:01,
-//   nom:"ALGO", 
-//   PromoID:01,
-//   Semestre:"S1"
+db.Module.create({
+  nom:"ALGO1", 
+  PromoID:01,
+  Semestre:"S1"
   
-// });
+});
+db.Module.create({
+  nom:"ARCHI2", 
+  PromoID:02,
+  Semestre:"S1"
+  
+});
+db.Module.create({
+  nom:"POO", 
+  PromoID:02,
+  Semestre:"S1"
+  
+ });
+
+ 
+ db.Groupe.create({
+  nom:"G3", 
+  PromoId:01
+});
 // db.Promo.create({
 //   nom:"L1",
 //   anneScorlariteeID:01
@@ -173,7 +190,7 @@ require('./app/routes/emplois.routes')(app);
   // controller.SuppEtudiant;
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
-app.listen(PORT,'0.0.0.0', () => {
+app.listen(PORT,'192.168.30.77', () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 // add this comment

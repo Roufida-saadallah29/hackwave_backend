@@ -11,25 +11,10 @@ var DataTypes = require('sequelize/lib/data-types');
 const { Enseignant } = require("../models");
 
 exports.afficherListeSalles=async(req,res)=>{
-  const x=await EmploiDeTemps.findAll(
-    {
-      where:{
-        Jour:req.body.Jour,
-        [op.or]: [
-      {hourDebut:{[op.gte]:req.body.hourDebut,[op.lt]:req.body.hourFin}},
-      {hourFin:{[op.gt]:req.body.hourDebut,[op.lte]:req.body.hourFin}}
-      ]},
-      attributes: ['SalleID'], 
-    
-    });
-    var arr2=[];
-    x.forEach(element => {
-      arr2.push(element.SalleID);
-    });
+
     Salle.findAll({
      where: {
        Type:req.body.type,
-       SalleNom:{[op.notIn]:arr2}
      },
      attributes: ['SalleNom'], 
     })
@@ -46,6 +31,8 @@ exports.afficherListeSalles=async(req,res)=>{
       });
     });
     }
+
+
 exports.ajouterSalle = async (req, res) => {
     Salle.findOne({
         where: {
@@ -76,8 +63,8 @@ exports.afficherListeModule= async (req,res)=>{
     Module.findAll({
 
    where: {
-     Semestre:req.query.Semestre,
-     PromoID:req.query.PromoID,     
+     Semestre:req.body.Semestre,
+     PromoID:req.body.PromoID,     
    },
   })
   .then(modules=>{

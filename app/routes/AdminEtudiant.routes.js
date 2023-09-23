@@ -15,13 +15,22 @@ module.exports = function(app) {
       "/api/Etudiant/getStudent",
       controller.getStudent
     );
+
+    app.post(
+      "/api/Etudiant/getStudentGroupe",
+      controller.getStudentGroupe
+    );
       app.post(
         "/api/Etudiant/ajouteretudautomatique",
         controller.ajouteretudautomatique
       );
       app.post(
-        "/api/Etudiant/modifyUserEtu",
+        "/api/Etudiant/modifyUseretudiant",
         controller.modifyUserEtu
     );
+    app.post(
+      "/consulternotes",
+      controller.consulterNotes
+  );
     app.get("/list_etudiant",controller.Listetudiant)
     };

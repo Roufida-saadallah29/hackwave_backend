@@ -17,11 +17,7 @@ const controller= require("../controllers/user.controller");
         "/api/user/modifyUserProfile",
          controller.modifyUserProfile
      );
-     app.get("/profile_picture",controller.profilepic);
-     app.post(
-        "/api/user/SuppUserauto",
-             controller.SuppUserauto
-     );
+
      app.post(
         "/api/user/Changermotpass",
         controller.Changermotpass

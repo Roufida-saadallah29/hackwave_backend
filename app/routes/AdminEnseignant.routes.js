@@ -16,12 +16,13 @@ module.exports = function(app) {
         "/api/Enseignant/getProf",
         controller.getProf
       );
+      //ajouter automatiquement avec un fichier exel
       app.post(
-        "/api/Enseignant/aeignantauto",
+        "/api/Enseignant/ajouterenseignantauto",
         controller.aeignantauto
       );
       app.post(
-        "/api/Enseignant/modifyUserEnse",
+        "/api/Enseignant/modifyUserEnseerenseignant",
         controller.modifyUserEnse
       ); 
       

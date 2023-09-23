@@ -55,16 +55,16 @@ db.Etudiant.belongsTo(db.user);
 
 ])*/
 
-db.Module.belongsToMany(db.Enseignant,{
-  through: "EnseignantModule",
-  foreignKey: "ModuleId",
-  otherKey: "EnseignantId",
-  });
-  db.Module.belongsToMany(db.Etudiant,{
-    through: "EtudiantModule",
-    foreignKey: "ModuleId",
-    otherKey: "EtudiantId",
-    });
+// db.Module.belongsToMany(db.Enseignant,{
+//   through: "EnseignantModule",
+//   foreignKey: "ModuleId",
+//   otherKey: "EnseignantId",
+//   });
+//   db.Module.belongsToMany(db.Etudiant,{
+//     through: "EtudiantModule",
+//     foreignKey: "ModuleId",
+//     otherKey: "EtudiantId",
+//     });
 /*db.Etudiant.belongsTo(db.Groupe);
 db.Groupe.belongsTo(db.Promo);
 db.Promo.hasMany(db.Groupe,{

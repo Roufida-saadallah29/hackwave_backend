@@ -49,7 +49,7 @@ exports.ajouterenseignant = (req, res) => {
           service: 'gmail',
           auth: {
             user: 'jr_saadallah@esi.dz',
-            pass: 'NFWs=3*g:t/53DK|@,}U3:1&QCK_rKk$L-XVbE9]'
+            pass: 'mypass'
           }});
         var mailOptions = {
           from: 'jr_saadallah@esi.dz',
@@ -287,20 +287,33 @@ exports.aeignantauto= (req, res) => {
               
             }
           })}).then(promo=>{
-        if(req.body.type!= null && req.body.module!= null && req.files.file!= null && req.body.Id!= null ){
-        EnseignantModule.create({
-          Type: req.body.type,
-          FilePath: saveAs,
-          FileName: name,
-          ModuleId:modid,
-          PromoID: modpromoid,
-          EnseignantId: req.body.Id,
-          Semestre:modesem
-        })}
-        resolve("done!");
-        return res.send({
-          message:" Success!!"
-        })
+            Groupe.findOne({
+              where:{
+                nom: req.body.groupe,
+                PromoId:modpromoid
+              }
+            }).then(grp=>{
+              if(req.body.type!= null && req.body.module!= null && req.files.file!= null && req.body.Id!= null ){
+                EnseignantModule.create({
+                  Type: req.body.type,
+                  FilePath: saveAs,
+                  FileName: name,
+                  moduleId:modid,
+                  PromoID: modpromoid,
+                  EnseignantId: req.body.Id,
+                  GroupeId:grp.Id
+                })} 
+                resolve("done!");
+                return res.send({
+                  message:" Success!!"
+                })
+          }).catch(err2 => {
+            reject(err2);
+            res.status(500).send({
+              message:
+                err.message || "Can't upload this file!!"
+            });
+             });
       }).catch(err => {
         reject(err);
         res.status(500).send({
@@ -318,132 +331,75 @@ exports.aeignantauto= (req, res) => {
     }
     
   }
-  exports.ajouterlesnotes= (req, res) => {
-      return new Promise((resolve,reject)=>{
-        const Objs = JSON.parse(JSON.stringify(req.body));
-        const oj= Object.values(Objs)
-        Module.findOne({
-          where:{
-            nom:req.body.module,
-          }
-        }).then(mod=>{
-          modd=mod.Id;
-        if(req.body.Groupe!= null){
-         Promo.findOne({
-          where:{
-            nom:req.body.Promotion,
-          }
-         }).then(promo=>{
-          prm=promo.Id
-          return Groupe.findOne({
-            where:{
-              PromoId: prm,
-              nom: req.body.Groupe
-            }
-          }).then(group=>{
-            grp=group.Id
-            
-          })
-
-         })
-         Etudiant.findAll({
-          where: {
-            GroupeId: grp
-          }
-         }).then(etud=>{
-         oj.forEach((obj) => {
-          let Etudiantts = etud;
-          Etudiantts.forEach((row) => {
-           Etudiant.findOne({
-            where:{
-              Id: row.Id
-            }
-           }).then(ert=>{
-            ZS=ert.userId;
-            return User.findOne({
-              where:{
-                Id:ZS
-              }
-            }).then(npr=>{
-              nm=npr.FirstName,
-              pr=npr.LastName;
-              if(obj.Nom==nm && obj.Prénom==pr){
-              EtudiantModule.create({
-                EtudiantId: row.Id,
-                ModuleId:modd,
-                NoteEMD1: obj.emd1,
-                NoteEMD2: obj.emd2,
-                NoteTD: obj.CC,
-                Moyenne: obj.moyenne
-              })
-            }})
-           })
-          })
-        })
-
-        
-        resolve("done");
-      return res.send({message:"dones"})
-
-         }).catch(err => {
-          reject(err);
-          res.status(500).send({
-            message:
-              err.message || "errors when doing this operation!!"
-          });
-           });
-           }
-        else{
-           Etudiant.findAll({
-              where: {
-                Promotion: req.body.Promotion
-              }
-             }).then(etud=>{
-             oj.forEach((obj) => {
-              let Etudiantts = etud;
-              Etudiantts.forEach((row) => {
-               Etudiant.findOne({
-                where:{
-                  Id: row.Id
-                }
-               }).then(ert=>{
-                ZS=ert.userId;
-                return User.findOne({
-                  where:{
-                    Id:ZS
-                  }
-                }).then(npr=>{
-                  nm=npr.FirstName,
-                  pr=npr.LastName;
-                  if(obj.Nom==nm && obj.Prénom==pr){
-                  EtudiantModule.create({
-                    EtudiantId: row.Id,
-                    ModuleId:modd,
-                    NoteEMD1: obj.emd1,
-                    NoteEMD2: obj.emd2,
-                    NoteTD: obj.CC,
-                    Moyenne: obj.moyenne
-                  })
-                }})
-               })
-
-        })
-      
-      
-      });
-      resolve("done");
-      return res.send({message:"dones"})
-
-         }).catch(err => {
-          reject(err);
-          res.status(500).send({
-            message:
-              err.message || "errors when doing this operation!!"
-          });
-           });
+  exports.ajouterlesnotes = (req, res) => {
+    const { module, Promotion, data } = req.body;
+  
+    // Find the Module by name
+    Module.findOne({
+      where: {
+        nom: module,
+      },
+    })
+      .then((foundModule) => {
+        if (!foundModule) {
+          return res.status(404).json({ message: 'Module not found' });
         }
-        
-        })})}
+  
+        // Loop through the data and save student notes
+        const promises = data.map((studentData) => {
+          const { Nom, Prénom, EtudiantId, emd1, emd2, CC, moyenne, remarque } = studentData;
+  
+          // Assuming you have an Etudiant model with a unique ID for each student
+          // Find the student by EtudiantId
+          return Etudiant.findOne({
+            where: {
+              id: EtudiantId,
+            },
+          })
+            .then((foundStudent) => {
+              if (!foundStudent) {
+                return res.status(404).json({ message: `Student with ID ${EtudiantId} not found` });
+              }
+  
+              // Save student module data
+              return EtudiantModule.create({
+                EtudiantId: foundStudent.Id,
+                moduleId: foundModule.Id,
+                moduleName:foundModule.nom,
+                NoteEMD1: emd1,
+                NoteEMD2: emd2,
+                NoteTD: CC,
+                Moyenne: moyenne,
+                PromoId: foundModule.PromoID,
+                Remarque: remarque,
+              });
+            })
+            .then(() => {
+              // Success for individual student
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+              // Handle error for individual student here if needed
+            });
+        });
+  
+        // Use Promise.all to wait for all promises to resolve
+        Promise.all(promises)
+          .then(() => {
+            return res.json({ message: 'Student data saved successfully' });
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+          });
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+      });
+  };
+  
+
 
 exports.listnotess= (req, res) => {
   return new Promise((resolve,reject)=>{
