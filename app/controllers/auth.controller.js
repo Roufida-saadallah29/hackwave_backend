@@ -5,8 +5,7 @@ const Role = db.role;
 const Report = db.report;
 const Category = db.category;
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey("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");
-//sgMail.setApiKey("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");
+sgMail.setApiKey("your API KEY");
 
 const Op = db.Sequelize.Op;
 const crypto = require('crypto');
